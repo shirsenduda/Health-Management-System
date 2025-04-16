@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../../Context/AdminContext";
 import {
   UserRound,
@@ -7,10 +7,15 @@ import {
   Ban,
   Clock,
   CheckCircle,
+  Bell,
 } from "lucide-react";
+import { FaEdit } from "react-icons/fa";
+import SendMessageCard from "../../Componets/SendMessageCard "; // Adjust path if needed
 
 const Dashboard = () => {
   const { aToken, getDashData, dashData } = useContext(AdminContext);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (aToken) {
@@ -52,7 +57,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-6 relative">
       <h2 className="text-2xl font-semibold mb-6">Admin Dashboard</h2>
 
       {/* Stats Cards */}
@@ -72,10 +77,11 @@ const Dashboard = () => {
       </div>
 
       {/* Latest Appointments */}
-      <div className="mt-4">
+      <div className="mt-6">
         <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
           <Clock className="text-gray-600" size={20} />
           Latest Appointments
+          <Bell className="text-yellow-500 ml-2" size={18} />
         </h3>
 
         <div className="bg-white p-4 rounded-xl shadow-lg max-h-[400px] overflow-y-auto border border-gray-200">
@@ -88,6 +94,7 @@ const Dashboard = () => {
                   <th className="px-4 py-3">Doctor</th>
                   <th className="px-4 py-3">Date</th>
                   <th className="px-4 py-3">Time</th>
+                  <th className="px-4 py-3">Notification</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,8 +104,6 @@ const Dashboard = () => {
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-4 py-3 font-medium">{index + 1}</td>
-
-                    {/* Patient Name & Image */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
@@ -109,23 +114,27 @@ const Dashboard = () => {
                         <span>{appt?.userData?.name || "N/A"}</span>
                       </div>
                     </td>
-
-                    {/* Doctor Name & Image */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
-                          src={
-                            appt?.docData?.image || "/placeholder-doctor.png"
-                          }
+                          src={appt?.docData?.image || "/placeholder-doctor.png"}
                           alt="doctor"
                           className="w-8 h-8 rounded-full object-cover border"
                         />
                         <span>{appt?.docData?.name || "N/A"}</span>
                       </div>
                     </td>
-
                     <td className="px-4 py-3">{appt.slotDate}</td>
                     <td className="px-4 py-3">{appt.slotTime}</td>
+                    <td className="px-4 py-3 cursor-pointer">
+                      <FaEdit
+                        className="text-gray-600 hover:text-blue-600 transition"
+                        onClick={() => {
+                          setSelectedUser(appt?.userData);
+                          setIsModalOpen(true);
+                        }}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -137,6 +146,35 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Message Modal with SendMessageCard */}
+      {isModalOpen && selectedUser && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl w-[90%] max-w-md p-6">
+            <h4 className="text-lg font-semibold mb-4">Send Message</h4>
+            <p className="text-sm text-gray-600 mb-2">
+              To: <span className="font-medium">{selectedUser?.name}</span>
+            </p>
+
+            <SendMessageCard
+              selectedUserId={selectedUser._id}
+              onMessageSent={() => {
+                setIsModalOpen(false);
+                setSelectedUser(null);
+              }}
+            />
+
+            <div className="mt-4 flex justify-end">
+              <button
+                className="px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
