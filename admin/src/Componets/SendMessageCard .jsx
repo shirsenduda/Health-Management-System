@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
-const SendMessageCard = ({ selectedUserId, onMessageSent }) => {
+const SendMessageCard = () => {
+  // const { sendMessageHandler } = useContext(AdminContext);
   const [messageText, setMessageText] = useState("");
   
-
-    
-
   return (
     <>
       <textarea
@@ -15,7 +13,14 @@ const SendMessageCard = ({ selectedUserId, onMessageSent }) => {
         value={messageText}
         onChange={(e) => setMessageText(e.target.value)}
       />
+      <input
+        type="file"
+        accept="image/*"
+        className="mt-2"
+        onChange={(e) => setImageFile(e.target.files[0])}
+      />
       <button
+        onClick={handleSend}
         className="mt-4 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         Send Message

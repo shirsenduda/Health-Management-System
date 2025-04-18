@@ -1,22 +1,31 @@
 import React, { useContext } from "react";
 import { AdminContext } from "../Context/AdminContext";
+import { DoctorContext } from "../Context/DoctorContext";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineMenu } from "react-icons/hi";
 import { FaUserCircle } from "react-icons/fa";
 
 const Nav = ({ isShrunk, setIsShrunk }) => {
   const { aToken, setAToken } = useContext(AdminContext);
+  const { doctorToken, setDoctorToken } = useContext(DoctorContext);
   const navigate = useNavigate();
 
   const logout = () => {
+    // Clear both tokens from context
     setAToken("");
+    setDoctorToken("");
+
+    // Remove from localStorage
     localStorage.removeItem("aToken");
+    localStorage.removeItem("dToken");
+
+    // Redirect to login page
     navigate("/");
   };
 
   return (
     <nav className="bg-white px-6 py-4 flex justify-between items-center shadow-md border-b border-gray-200">
-      {/* Left: Logo + Hamburger (desktop only) */}
+      {/* Left: Logo + Hamburger */}
       <div className="flex items-center gap-4">
         <img
           src="/assets/assets_frontend/logo.png"
@@ -37,11 +46,9 @@ const Nav = ({ isShrunk, setIsShrunk }) => {
           <FaUserCircle className="text-3xl text-blue-600" />
           <div className="flex flex-col leading-tight">
             <p className="text-sm text-gray-500 font-medium">Welcome</p>
-            {aToken ? (
-              <p className="text-base font-semibold text-gray-800">Admin</p>
-            ) : (
-              <p className="text-base font-semibold text-gray-800">Doctor</p>
-            )}
+            <p className="text-base font-semibold text-gray-800">
+              {aToken ? "Admin" : doctorToken ? "Doctor" : "User"}
+            </p>
           </div>
         </div>
 

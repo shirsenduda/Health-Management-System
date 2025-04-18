@@ -1,15 +1,18 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../Context/AdminContext";
+import { DoctorContext } from "../Context/DoctorContext";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const [userType, setUserType] = useState("Admin");
   const { setAToken, backendUrl } = useContext(AdminContext);
+  const { setDoctorToken } = useContext(DoctorContext); // ✅ FIXED: use setDoctorToken to store doctor token
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // ✅ Initialize navigation
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,14 +21,19 @@ const Login = () => {
       const { data } = await axios.post(`${backendUrl}${endpoint}`, { email, password });
 
       if (data.success && data.token) {
-        console.log("Token received:", data.token);
-        localStorage.setItem("aToken", data.token);
-        setAToken(data.token); // ✅ Update context state
-
-        toast.success("Login successful! Redirecting...");
-        setTimeout(() => navigate("/admin-panel"), 1000); // ✅ Redirect user
+        if (userType === "Admin") {
+          localStorage.setItem("aToken", data.token);
+          setAToken(data.token);
+          toast.success("Admin login successful!");
+          setTimeout(() => navigate("/admin-panel"), 1000);
+        } else {
+          localStorage.setItem("dToken", data.token);
+          setDoctorToken(data.token); // ✅ Fixed here
+          toast.success("Doctor login successful!");
+          setTimeout(() => navigate("/doctor-dashboard"), 1000);
+        }
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Login failed.");
       }
     } catch (error) {
       console.error("Login error:", error.response?.data?.message || error.message);

@@ -10,6 +10,8 @@ const AdminContextProvider = (props) => {
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
+  // const [message, setMessage] = useState([]);
+  // const [messageImage, setMessageImage] = useState([]);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const getAllDoctors = async () => {
@@ -110,7 +112,7 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
         headers: { aToken },
       });
-  
+
       // Handle the successful response
       if (data.success) {
         console.log(data.dashData);
@@ -124,7 +126,10 @@ const AdminContextProvider = (props) => {
       toast.error("Failed to fetch dashboard data");
     }
   };
+
   
+  
+
   const value = {
     aToken,
     setAToken,
@@ -137,7 +142,7 @@ const AdminContextProvider = (props) => {
     getAllAppointments,
     cancelAppointment,
     getDashData,
-    dashData
+    dashData,
   };
 
   return (
